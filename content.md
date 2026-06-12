@@ -1,45 +1,75 @@
 ## Videos
 
-- https://www.youtube.com/watch?v=U6gg_bi1I70 | Tutorial
-- https://www.youtube.com/watch?v=_xTvejNLhyk | Deep Dive
+-  | Isolated issue
+-  | Deep Dive
 
 ---
 
 # Issues & Updates
 
-> This file is the single source of truth for the demo library.  
-> Edit it in GitHub and the site updates automatically on next page load.
+> This file is the single source of truth for the guestsage.com Booking Engine imprementation for zaciszeturawa.pl — Work in Progress 
 
 ---
 
-## v1.1.0 — June 2026
+## v0.0.1 — 12 June 2026
 
-### Added
+### #1 Top priority fix requests:
 
-- **Multi-language inbound support** — AI now handles queries in Polish, German, and English within the same conversation thread
-- **Live inventory sync** — KWHotel integration now pulls real-time room availability with sub-second latency
-- **Confidence scoring** — every AI response now carries an internal confidence score; low-confidence answers auto-escalate to human
+- **Database SLOW AF** — affecting both BE and PMS - currently exploring 3rd party VPS options.
 
-### Fixed
+- **Make stay packages NOT visible if not available for the selected dates** — this is confusing be cause we have a lot of them, it makes the whoe BE slow, there's no logic to only show them if someone is off by 1 day for example. Meanwhile, "Show unavailable offers” MUST be enabled, otherwise the calendar looks like the hotel is closed during PEAK season. 
 
-- Resolved a race condition in the handover protocol that occasionally caused duplicate escalation emails
-- Fixed context loss when a conversation exceeded 4,000 tokens in the customer care sequence
-- Corrected timezone handling for booking confirmations in UTC+2 regions
+- **PMS sync including all GSBE price plans and all their settings** — instructions still unclear.
+
+- **ONBOARDING CHECKLIST** — requested on 27 May, probably doesn't exist
+
+## Known Issues
+
+### #2 Sign-up, Sign-in, Sign-out, Cookies
+
+1. **By default the GSBE is requesting access to other apps and services in a modal** - NOT A DESIRED FUNCTIONALITY
+2. **What determines whether Gmail social login loads by default on mobile and on desktop?** Unclear, seem random
+3. **I still see the login banner after I’ve just logged in (on mobile).** *Fix timeline estimate?*
+4. **I only see a login login link on desktop when there’s an active discount for that.** - maybe that's actually good. Can we disable logging in completely? Unclear
+5. **I don’t see any indication AT ALL indicating if I’m currently logged in or not. Impossible to log out.** This is a  USER PRIVACY VIOLATION! *Fix timeline estimate?*
 
 ---
 
-## v1.0.2 — May 2026
+### #3 API SYNC
 
-### Fixed
+1. **API DOCS NOT AVAILABLE** — I know which data has a 2 way sync, which only one way, and which way is it?? Send specific documentation PLEASE
 
-- Response latency under high concurrent load reduced from ~3.2s to ~0.8s avg
-- Session memory now persists correctly across page refreshes in the web widget
 
-### Known Issues
+### #4 CSS docs
 
-- **iOS Safari scroll bug** — the chat widget scroll position resets on keyboard dismiss. Workaround: user can tap outside the input to dismiss keyboard before scrolling.
-- **Outlook compatibility** — automated email summaries render incorrectly in Outlook 2019 and earlier. Modern Outlook (365) and Gmail are unaffected.
-- Integration with **XYZ CRM** pending audit from their API team — ETA unknown.
+1. **Supported and unsupported CSS rules?** - unknown
+2. **Content mapping docs?** - non-existent
+
+
+### #5 Rich HTML emails
+- **NOT SUPPORTED** — emails look basic AF. *Fix timeline estimate?*
+
+### #6 Additional options config
+
+1. **UNCLEAR** - units: pieces / per person / per night / per night per person, etc VS how it's shown in the checkout - I don't get it. Docs?
+
+
+### #7 TBC
+
+
+
+## Fixed
+
+1. Crucial paynow WEBHOOK (adres powiadomień)  **https://cloud.kwhotel.com/paynow/response**
+
+
+
+# Contact
+
+**marcin@zaciszeturawa.pl**
+**szydlowski001@gmail.com**  
+
+
 
 ---
 
@@ -47,22 +77,17 @@
 
 | Feature | Status | Target |
 |---|---|---|
-| Voice input for inbound queries | In progress | Q3 2026 |
-| WhatsApp Business channel | Planned | Q3 2026 |
-| Analytics dashboard | Planned | Q4 2026 |
-| Self-serve onboarding flow | Under review | TBD |
+| Unclear | In progress | Q3 2026 |
+| Unclear | Planned | Q3 2026 |
+| Unclear | Planned | Q4 2026 |
+| Unknown | Under review | TBD |
 
 ---
 
 ## Architecture Notes
 
-The system runs on a **three-layer stack**:
+WIP
 
-```
-[Inbound Channel]  →  [Routing Layer]  →  [Agent Core]
-  Web / Social          Intent + Lang       LLM + Tools
-  Email / Phone         Confidence Score    CRM / Booking
-                        Escalation Rules    Knowledge Base
 ```
 
 Each agent is stateless per session but uses a **persistent context window** managed by the routing layer. This means:
@@ -84,7 +109,5 @@ if (response.confidence < 0.72 || intent === 'complaint') {
 
 ---
 
-## Contact
 
-For technical issues: **ops@brand-mind.eu**  
-For billing or account changes: use the client portal or contact your account manager directly.
+
