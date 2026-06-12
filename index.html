@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>brandmind — Demo Library</title>
+  <meta name="description" content="Watch brandmind AI systems in action. Real demos, real integrations, real results.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Tomorrow:ital,wght@0,100;0,300;0,400;0,600;0,700;0,800;1,400&family=Electrolize&family=Tiny5&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* ── TOKENS (exact match to brand-mind.eu) ── */
+    :root {
+      --abyss:        #0a0a14;
+      --abyss-light:  #12121f;
+      --signal:       #7b61ff;
+      --signal-glow:  #9b85ff;
+      --mint:         #22d3ee;
+      --ghost:        #f0eff4;
+      --ghost-dim:    #c8c6d0;
+      --graphite:     #18181b;
+      --f-aldrich:    "Aldrich", sans-serif;
+      --f-tomorrow:   "Tomorrow", sans-serif;
+      --f-electro:    "Electrolize", sans-serif;
+      --f-tiny5:      "Tiny5", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [x-cloak] { display: none !important; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--abyss);
+      color: var(--ghost);
+      font-family: var(--f-tomorrow);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(123,97,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,97,255,.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .grid-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(123,97,255,.07), transparent);
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      transition: background .4s, border-color .4s, backdrop-filter .4s;
+    }
+    .navbar.scrolled {
+      background: rgba(10,10,20,.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(123,97,255,.1);
+    }
+    .nav-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--f-tiny5);
+      font-size: 2.5rem;
+      color: var(--ghost);
+      text-decoration: none;
+      letter-spacing: .025em;
+      line-height: 1;
+    }
+    @media(min-width:768px){ .logo { font-size: 3rem; } }
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 2rem;
+    }
+    @media(min-width:768px){ .nav-links { display: flex; } }
+    .nav-link {
+      font-family: var(--f-electro);
+      font-size: .875rem;
+      color: var(--ghost-dim);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      transition: color .2s;
+    }
+    .nav-link:hover, .nav-link.active { color: var(--signal); }
+    .nav-cta {
+      font-family: var(--f-tomorrow);
+      font-size: .875rem;
+      font-weight: 600;
+      padding: .625rem 1.5rem;
+      background: rgba(123,97,255,.1);
+      border: 1px solid rgba(123,97,255,.4);
+      color: var(--signal);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      transition: background .2s, border-color .2s;
+    }
+    .nav-cta:hover {
+      background: rgba(123,97,255,.2);
+      border-color: var(--signal);
+    }
+    .hamburger {
+      display: block;
+      background: none;
+      border: none;
+      color: var(--ghost);
+      cursor: pointer;
+      padding: .25rem;
+    }
+    @media(min-width:768px){ .hamburger { display: none; } }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      top: 70px;
+      background: rgba(10,10,20,.98);
+      z-index: 49;
+      padding: 2rem 1.5rem;
+      flex-direction: column;
+      gap: 1.5rem;
+      border-top: 1px solid rgba(123,97,255,.1);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu .nav-link { font-size: 1rem; padding: .5rem 0; }
+    .mobile-menu .nav-cta { text-align: center; padding: .75rem; }
+
+    /* ── MAIN ── */
+    main {
+      position: relative;
+      z-index: 10;
+      padding-top: 80px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 4rem;
+    }
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1.75rem;
+    }
+    .label-line { width: 3rem; height: 1px; background: var(--signal); }
+    .label-text {
+      font-family: var(--f-tiny5);
+      font-size: .875rem;
+      color: var(--signal);
+      text-transform: uppercase;
+      letter-spacing: .3em;
+    }
+    .hero h1 {
+      font-family: var(--f-aldrich);
+      font-size: clamp(3rem, 9vw, 6.5rem);
+      line-height: .92;
+      letter-spacing: -.025em;
+      text-transform: uppercase;
+      color: var(--ghost);
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 .accent { color: var(--signal); }
+    .hero-sub {
+      font-family: var(--f-tomorrow);
+      font-size: 1.2rem;
+      color: var(--ghost-dim);
+      font-weight: 300;
+      max-width: 38rem;
+      line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .stat-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--signal);
+      animation: blink 2s cubic-bezier(.4,0,.6,1) infinite;
+    }
+    .stat-dot.mint { background: var(--mint); animation-delay: .5s; }
+    .stat-txt {
+      font-family: var(--f-electro);
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(123,97,255,.7);
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50% { opacity: .35; }
+    }
+
+    /* ── DIVIDER ── */
+    .hr {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(123,97,255,.3), transparent);
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-wrap {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 1rem;
+    }
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .f-btn {
+      font-family: var(--f-electro);
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: .45rem 1rem;
+      background: transparent;
+      border: 1px solid rgba(123,97,255,.15);
+      color: var(--ghost-dim);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .f-btn:hover {
+      border-color: rgba(123,97,255,.4);
+      color: var(--ghost);
+    }
+    .f-btn.active {
+      background: rgba(123,97,255,.15);
+      border-color: var(--signal);
+      color: var(--signal);
+    }
+    .search-wrap { margin-left: auto; }
+    .search-input {
+      font-family: var(--f-electro);
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: .45rem 1rem;
+      background: rgba(18,18,31,.6);
+      border: 1px solid rgba(123,97,255,.15);
+      color: var(--ghost);
+      outline: none;
+      transition: border-color .2s;
+      width: 180px;
+    }
+    .search-input::placeholder { color: rgba(200,198,208,.25); }
+    .search-input:focus { border-color: rgba(123,97,255,.4); }
+    .result-count {
+      font-family: var(--f-electro);
+      font-size: .68rem;
+      color: rgba(200,198,208,.35);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding-bottom: .5rem;
+    }
+
+    /* ── VIDEO GRID ── */
+    .grid-wrap {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 7rem;
+    }
+    .v-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    @media(max-width:1024px){ .v-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width:600px){  .v-grid { grid-template-columns: 1fr; } }
+
+    /* ── VIDEO CARD ── */
+    .v-card {
+      position: relative;
+      background: rgba(18,18,31,.5);
+      border: 1px solid rgba(123,97,255,.07);
+      cursor: pointer;
+      transition: border-color .4s, transform .3s, box-shadow .4s;
+      overflow: hidden;
+    }
+    .v-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(123,97,255,.04), transparent);
+      opacity: 0;
+      transition: opacity .4s;
+      pointer-events: none;
+    }
+    .v-card:hover {
+      border-color: rgba(123,97,255,.3);
+      transform: translateY(-3px);
+      box-shadow: 0 24px 48px rgba(0,0,0,.45), 0 0 30px rgba(123,97,255,.07);
+    }
+    .v-card:hover::before { opacity: 1; }
+
+    /* thumbnail */
+    .thumb {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: var(--abyss-light);
+    }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .5s ease, filter .4s;
+      filter: brightness(.8) saturate(.9);
+      display: block;
+    }
+    .v-card:hover .thumb img {
+      transform: scale(1.05);
+      filter: brightness(1) saturate(1);
+    }
+    .thumb-fallback {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--abyss-light), rgba(123,97,255,.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thumb-fallback svg { opacity: .15; }
+    /* play overlay */
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .play-ring {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(123,97,255,.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .3s, transform .3s, box-shadow .3s;
+      box-shadow: 0 0 20px rgba(123,97,255,.35);
+    }
+    .v-card:hover .play-ring {
+      background: var(--signal);
+      transform: scale(1.12);
+      box-shadow: 0 0 40px rgba(123,97,255,.6);
+    }
+    .play-ring svg { margin-left: 3px; }
+    /* duration badge */
+    .dur {
+      position: absolute;
+      bottom: .45rem;
+      right: .5rem;
+      font-family: var(--f-electro);
+      font-size: .65rem;
+      color: var(--ghost);
+      background: rgba(10,10,20,.82);
+      padding: .15rem .45rem;
+      letter-spacing: .04em;
+    }
+
+    /* card body */
+    .card-body { padding: 1.25rem; }
+    .card-cat {
+      display: inline-block;
+      font-family: var(--f-electro);
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--mint);
+      border: 1px solid rgba(34,211,238,.2);
+      padding: .2rem .5rem;
+      margin-bottom: .75rem;
+    }
+    .card-title {
+      font-family: var(--f-aldrich);
+      font-size: .95rem;
+      color: var(--ghost);
+      text-transform: uppercase;
+      letter-spacing: -.01em;
+      line-height: 1.3;
+      margin-bottom: .5rem;
+    }
+    .card-desc {
+      font-family: var(--f-electro);
+      font-size: .78rem;
+      color: rgba(200,198,208,.55);
+      line-height: 1.6;
+      margin-bottom: .75rem;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-wrap: wrap;
+      padding-top: .75rem;
+      border-top: 1px solid rgba(123,97,255,.07);
+    }
+    .card-meta-item {
+      font-family: var(--f-electro);
+      font-size: .65rem;
+      color: rgba(200,198,208,.35);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .card-meta-sep {
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: rgba(200,198,208,.2);
+    }
+    .card-meta-channel {
+      font-family: var(--f-electro);
+      font-size: .65rem;
+      color: rgba(123,97,255,.6);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    /* empty state */
+    .empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .empty p {
+      font-family: var(--f-electro);
+      font-size: .8rem;
+      color: rgba(200,198,208,.25);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+    }
+
+    /* ── MODAL ── */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,20,.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .modal-box {
+      width: 100%;
+      max-width: 920px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: -2.6rem;
+      right: 0;
+      background: none;
+      border: 1px solid rgba(123,97,255,.2);
+      color: var(--ghost-dim);
+      cursor: pointer;
+      font-family: var(--f-electro);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: .38rem .8rem;
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      transition: border-color .2s, color .2s;
+    }
+    .modal-close:hover {
+      border-color: var(--signal);
+      color: var(--signal);
+    }
+    .modal-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+    .modal-video iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .modal-meta {
+      padding: 1.1rem 0 0;
+      border-top: 1px solid rgba(123,97,255,.1);
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+    .modal-cat {
+      font-family: var(--f-electro);
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: var(--mint);
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-family: var(--f-aldrich);
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      color: var(--ghost);
+      letter-spacing: -.01em;
+    }
+
+    /* ── FOOTER (exact match) ── */
+    footer {
+      position: relative;
+      border-top: 1px solid rgba(123,97,255,.07);
+      padding: 3rem 0;
+    }
+    .ft-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .ft-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    @media(min-width:768px){ .ft-row { flex-direction: row; } }
+    .ft-logo {
+      font-family: var(--f-tiny5);
+      font-size: 1.25rem;
+      color: rgba(240,239,244,.6);
+      text-decoration: none;
+    }
+    .ft-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .ft-link {
+      font-family: var(--f-electro);
+      font-size: .75rem;
+      color: rgba(200,198,208,.4);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      transition: color .2s;
+    }
+    .ft-link:hover { color: var(--signal); }
+    .ft-copy {
+      font-family: var(--f-electro);
+      font-size: .75rem;
+      color: rgba(200,198,208,.25);
+    }
+    .ft-badge {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      justify-content: center;
+      margin-top: 2rem;
+      opacity: .2;
+    }
+    .ft-dot {
+      width: 8px;
+      height: 8px;
+      background: rgba(34,211,238,.4);
+      border-radius: 50%;
+      animation: blink 2s cubic-bezier(.4,0,.6,1) infinite;
+    }
+    .ft-badge-txt {
+      font-family: var(--f-tiny5);
+      font-size: .7rem;
+      color: rgba(34,211,238,.4);
+      text-transform: uppercase;
+      letter-spacing: .5em;
+    }
+
+    /* ── ALPINE TRANSITIONS ── */
+    [x-transition\:enter] { transition: opacity .2s ease, transform .2s ease; }
+    [x-transition\:enter-start] { opacity: 0; transform: scale(.97); }
+    [x-transition\:enter-end] { opacity: 1; transform: scale(1); }
+    [x-transition\:leave] { transition: opacity .15s ease; }
+    [x-transition\:leave-start] { opacity: 1; }
+    [x-transition\:leave-end] { opacity: 0; }
+  </style>
+</head>
+
+<body
+  x-data="lib()"
+  x-init="init()"
+  @keydown.escape.window="closeModal()"
+>
+
+  <!-- Grid background -->
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <!-- ══════════ NAVBAR ══════════ -->
+  <nav class="navbar" :class="{ scrolled }">
+    <div class="nav-inner">
+      <a href="https://brand-mind.eu/" class="logo">brandmind</a>
+
+      <div class="nav-links">
+        <a href="https://brand-mind.eu/#services"  class="nav-link">Sequence</a>
+        <a href="https://brand-mind.eu/#process"   class="nav-link">Protocol</a>
+        <a href="https://brand-mind.eu/#results"   class="nav-link">Results</a>
+        <a href="#"                                class="nav-link active">Demo Library</a>
+        <a href="https://brand-mind.eu/#contact"   class="nav-cta">Free Audit</a>
+      </div>
+
+      <button class="hamburger" @click="menuOpen = !menuOpen" aria-label="Toggle menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" :class="{ open: menuOpen }" x-cloak>
+    <a href="https://brand-mind.eu/#services" class="nav-link" @click="menuOpen=false">Sequence</a>
+    <a href="https://brand-mind.eu/#process"  class="nav-link" @click="menuOpen=false">Protocol</a>
+    <a href="https://brand-mind.eu/#results"  class="nav-link" @click="menuOpen=false">Results</a>
+    <a href="#"                               class="nav-link active">Demo Library</a>
+    <a href="https://brand-mind.eu/#contact"  class="nav-cta">Free Audit →</a>
+  </div>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="label-row">
+        <div class="label-line"></div>
+        <span class="label-text">Operations Lab</span>
+      </div>
+      <h1>Systems<br><span class="accent">In Action</span></h1>
+      <p class="hero-sub">
+        Every workflow. Every integration. Watch how we build AI-powered operations
+        for real businesses — zero fluff, zero chatbots, full results.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-dot"></div>
+          <span class="stat-txt" x-text="videos.length + ' demos archived'"></span>
+        </div>
+        <div class="stat">
+          <div class="stat-dot mint"></div>
+          <span class="stat-txt" x-text="categories.length + ' categories'"></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="hr"></div>
+
+    <!-- Filter bar -->
+    <div class="filter-wrap">
+      <div class="filter-bar">
+        <button class="f-btn" :class="{ active: filter === 'all' }" @click="filter = 'all'">All</button>
+        <template x-for="cat in categories" :key="cat">
+          <button
+            class="f-btn"
+            :class="{ active: filter === cat }"
+            @click="filter = cat"
+            x-text="cat"
+          ></button>
+        </template>
+        <div class="search-wrap">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search demos…"
+            x-model.debounce.200ms="search"
+          >
+        </div>
+      </div>
+      <p class="result-count" x-text="filtered.length + ' result' + (filtered.length !== 1 ? 's' : '')"></p>
+    </div>
+
+    <!-- Video grid -->
+    <div class="grid-wrap">
+      <div class="v-grid">
+
+        <template x-if="filtered.length === 0">
+          <div class="empty">
+            <p>No demos match your filter</p>
+          </div>
+        </template>
+
+        <template x-for="v in filtered" :key="v.id">
+          <article class="v-card" @click="openModal(v)" role="button" tabindex="0" @keydown.enter="openModal(v)">
+
+            <!-- Thumbnail -->
+            <div class="thumb">
+              <img
+                :src="'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg'"
+                :alt="v.title"
+                loading="lazy"
+                @error="$event.target.style.display='none'; $event.target.nextElementSibling.style.display='flex'"
+              >
+              <div class="thumb-fallback" style="display:none">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                  <polygon points="5 3 19 12 5 21 5 3" stroke="#7b61ff"/>
+                </svg>
+              </div>
+              <div class="play-overlay" aria-hidden="true">
+                <div class="play-ring">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                </div>
+              </div>
+              <span class="dur" x-text="v.duration"></span>
+            </div>
+
+            <!-- Info -->
+            <div class="card-body">
+              <span class="card-cat" x-text="v.category"></span>
+              <h3 class="card-title" x-text="v.title"></h3>
+              <p class="card-desc" x-text="v.description"></p>
+              <div class="card-meta">
+                <span class="card-meta-channel" x-text="v.channel"></span>
+                <div class="card-meta-sep"></div>
+                <span class="card-meta-item" x-text="v.views + ' views'"></span>
+                <div class="card-meta-sep"></div>
+                <span class="card-meta-item" x-text="v.likes + ' likes'"></span>
+              </div>
+            </div>
+
+          </article>
+        </template>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══════════ MODAL ══════════ -->
+  <div
+    class="modal-bg"
+    x-show="modal"
+    x-cloak
+    @click.self="closeModal()"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    style="display:none"
+  >
+    <div
+      class="modal-box"
+      x-show="modal"
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+      x-transition:leave="transition ease-in duration-150"
+      x-transition:leave-start="opacity-100 scale-100"
+      x-transition:leave-end="opacity-0 scale-95"
+      style="transform-origin: center; --tw-scale-x:1; --tw-scale-y:1;"
+    >
+      <button class="modal-close" @click="closeModal()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Close
+      </button>
+
+      <div class="modal-video">
+        <template x-if="modal">
+          <iframe
+            :src="'https://www.youtube.com/embed/' + modal.id + '?autoplay=1&rel=0&modestbranding=1&color=white'"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </template>
+      </div>
+
+      <div class="modal-meta" x-show="modal">
+        <span class="modal-cat" x-text="modal?.category"></span>
+        <h2 class="modal-title" x-text="modal?.title"></h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer>
+    <div class="ft-inner">
+      <div class="ft-row">
+        <a href="https://brand-mind.eu/" class="ft-logo">brandmind</a>
+        <div class="ft-links">
+          <a href="https://brand-mind.eu/#services" class="ft-link">Sequence</a>
+          <a href="https://brand-mind.eu/#process"  class="ft-link">Protocol</a>
+          <a href="https://brand-mind.eu/#results"  class="ft-link">Results</a>
+          <a href="https://brand-mind.eu/#pricing"  class="ft-link">Pricing</a>
+          <a href="https://brand-mind.eu/#contact"  class="ft-link">Contact</a>
+        </div>
+        <p class="ft-copy">© 2026 BRANDMIND</p>
+      </div>
+      <div class="ft-badge">
+        <div class="ft-dot"></div>
+        <span class="ft-badge-txt">Operations Lab — Made in the EU</span>
+        <div class="ft-dot" style="animation-delay:.5s"></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════ SCRIPT ══════════ -->
+  <script>
+    function lib() {
+      return {
+        scrolled:  false,
+        menuOpen:  false,
+        filter:    'all',
+        search:    '',
+        modal:     null,
+
+        // ════════════════════════════════════════════
+        // YOUR VIDEOS — edit this array to add demos.
+        // 'id' = YouTube video ID (the ?v=XXXXX part).
+        // 'duration' = display string, e.g. "2:34".
+        // ════════════════════════════════════════════
+        videos: [
+          {
+            id:          'U6gg_bi1I70',
+            title:       'How to Use Claude Code for FREE (2026)',
+            description: 'Full walkthrough of Claude Code — the agentic coding tool — running entirely for free. Setup, workflows, and real use cases covered end to end.',
+            category:    'Tutorial',
+            channel:     'Nick Saraev',
+            views:       '146K',
+            likes:       '2,892',
+            duration:    '27:41'
+          },
+          {
+            id:          '_xTvejNLhyk',
+            title:       'Claude Just Dropped UltraCode — It\'s Insane',
+            description: 'Claude UltraCode spins up 10 parallel agents managed by code instead of a master LLM. A deep breakdown of what this means and why it changes how you build.',
+            category:    'Deep Dive',
+            channel:     'Jack Roberts',
+            views:       '16.6K',
+            likes:       '352',
+            duration:    '19:37'
+          },
+        ],
+
+        get categories() {
+          return [...new Set(this.videos.map(v => v.category))];
+        },
+
+        get filtered() {
+          const s = this.search.toLowerCase();
+          return this.videos.filter(v => {
+            const catOk = this.filter === 'all' || v.category === this.filter;
+            const srchOk = !s || v.title.toLowerCase().includes(s) || v.description.toLowerCase().includes(s);
+            return catOk && srchOk;
+          });
+        },
+
+        openModal(v) {
+          this.modal = v;
+          document.body.style.overflow = 'hidden';
+        },
+
+        closeModal() {
+          this.modal = null;
+          document.body.style.overflow = '';
+        },
+
+        init() {
+          window.addEventListener('scroll', () => {
+            this.scrolled = window.scrollY > 20;
+          }, { passive: true });
+        }
+      };
+    }
+  </script>
+</body>
+</html>
