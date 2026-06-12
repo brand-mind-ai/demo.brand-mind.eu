@@ -390,6 +390,68 @@
     .ft-badge { display: flex; align-items: center; gap: .5rem; justify-content: center; margin-top: 2rem; opacity: .2; }
     .ft-dot { width: 8px; height: 8px; background: rgba(34,211,238,.4); border-radius: 50%; animation: blink 2s cubic-bezier(.4,0,.6,1) infinite; }
     .ft-badge-txt { font-family: var(--f-tiny5); font-size: .7rem; color: rgba(34,211,238,.4); text-transform: uppercase; letter-spacing: .5em; }
+
+    /* ── CTA BUTTON ── */
+    .hero-cta-wrap { margin-bottom: 2rem; }
+    .cta-btn {
+      position: relative;
+      display: inline-flex; align-items: center; gap: .75rem;
+      font-family: var(--f-tomorrow); font-weight: 700; font-size: 1rem;
+      text-transform: uppercase; letter-spacing: .2em;
+      color: var(--abyss);
+      background: var(--signal);
+      border: none; padding: 1rem 2.5rem;
+      cursor: pointer; text-decoration: none;
+      overflow: hidden;
+      transition: box-shadow .3s, transform .2s;
+    }
+    .cta-btn:hover {
+      box-shadow: 0 0 50px rgba(123,97,255,.5), 0 0 20px rgba(123,97,255,.3);
+      transform: translateY(-1px);
+    }
+    /* Animated scan shimmer */
+    .cta-btn::before {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+      animation: scan 2.4s ease-in-out infinite;
+    }
+    @keyframes scan {
+      0%   { left: -100%; }
+      60%  { left: 150%; }
+      100% { left: 150%; }
+    }
+    /* Pulsing border ring */
+    .cta-btn::after {
+      content: '';
+      position: absolute; inset: -3px;
+      border: 1px solid rgba(123,97,255,.5);
+      animation: ring-pulse 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes ring-pulse {
+      0%,100% { opacity: .4; inset: -3px; }
+      50%      { opacity: .9; inset: -5px; }
+    }
+    .cta-arrow {
+      display: inline-block;
+      transition: transform .2s;
+    }
+    .cta-btn:hover .cta-arrow { transform: translateX(4px); }
+
+    /* Videos-under-terminal section header */
+    .section-divider {
+      max-width: 80rem; margin: 0 auto;
+      padding: 3.5rem 1.5rem .5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-divider-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(123,97,255,.2), transparent); }
+    .section-divider-label {
+      font-family: var(--f-tiny5); font-size: .75rem;
+      color: rgba(123,97,255,.5); text-transform: uppercase; letter-spacing: .3em;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 
@@ -434,21 +496,16 @@
         <div class="label-line"></div>
         <span class="label-text">Operations Lab</span>
       </div>
-      <h1>Systems<br><span class="accent">In Action</span></h1>
-      <p class="hero-sub">
-        Every workflow. Every integration. Watch how we build AI-powered operations
-        for real businesses — zero fluff, zero chatbots, full results.
-      </p>
-      <div class="hero-stats">
-        <div class="stat">
-          <div class="stat-dot"></div>
-          <span class="stat-txt" x-text="videosLoading ? 'Loading…' : videos.length + ' demos archived'"></span>
-        </div>
-        <div class="stat">
-          <div class="stat-dot mint"></div>
-          <span class="stat-txt" x-text="videosLoading ? '' : categories.length + ' categories'"></span>
-        </div>
+      <h1>Guest Sage<br><span class="accent">Booking Engine</span></h1>
+      <div class="hero-cta-wrap">
+        <a href="https://be.guestsage.com/pl/0bf0dc4c-089f-42f4-8bf0-3ea22a76ad8a" class="cta-btn" target="_blank" rel="noopener">
+          Live Preview
+          <span class="cta-arrow">→</span>
+        </a>
       </div>
+      <p class="hero-sub">
+        Polish IT systems in action. Watch me struggle to get this thing up and running — you might learn something.
+      </p>
     </section>
 
     <div class="hr"></div>
@@ -456,8 +513,8 @@
     <!-- Tab bar -->
     <div class="tab-wrap">
       <div class="tab-bar">
-        <button class="tab-btn" :class="{ active: tab === 'demos' }"  @click="tab = 'demos'">Demo Library</button>
         <button class="tab-btn" :class="{ active: tab === 'issues' }" @click="tab = 'issues'">Issues &amp; Updates</button>
+        <button class="tab-btn" :class="{ active: tab === 'demos' }"  @click="tab = 'demos'">Demo Library</button>
       </div>
     </div>
 
@@ -528,7 +585,7 @@
     </div><!-- /demos tab -->
 
     <!-- ─── ISSUES TAB ─── -->
-    <div x-show="tab === 'issues'" x-cloak>
+    <div x-show="tab === 'issues'">
       <div class="terminal-wrap">
         <div class="terminal-window">
 
@@ -563,6 +620,71 @@
             x-ref="mdBody"
           ></div>
 
+        </div>
+      </div>
+      <!-- Videos under terminal -->
+      <div class="section-divider">
+        <span class="section-divider-label">Demo Library</span>
+        <div class="section-divider-line"></div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-wrap" x-show="!videosLoading" x-cloak>
+        <div class="filter-bar">
+          <button class="f-btn" :class="{ active: filter === 'all' }" @click="filter = 'all'">All</button>
+          <template x-for="cat in categories" :key="cat">
+            <button class="f-btn" :class="{ active: filter === cat }" @click="filter = cat" x-text="cat"></button>
+          </template>
+          <div class="search-wrap">
+            <input type="text" class="search-input" placeholder="Search demos…" x-model.debounce.200ms="search">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-wrap" style="padding-top:.5rem">
+        <!-- Skeleton -->
+        <div class="skeleton-grid" x-show="videosLoading">
+          <template x-for="n in skeletonCount" :key="n">
+            <div class="skeleton-card">
+              <div class="skeleton-thumb skel"></div>
+              <div class="skeleton-body">
+                <div class="skel skel-tag"></div>
+                <div class="skel skel-title"></div>
+                <div class="skel skel-title2"></div>
+                <div class="skel skel-ch"></div>
+              </div>
+            </div>
+          </template>
+        </div>
+        <!-- Grid -->
+        <div class="v-grid" x-show="!videosLoading" x-cloak>
+          <template x-if="filtered.length === 0">
+            <div class="empty"><p>No demos match your filter</p></div>
+          </template>
+          <template x-for="v in filtered" :key="v.id">
+            <article class="v-card" @click="openModal(v)" role="button" tabindex="0" @keydown.enter="openModal(v)">
+              <div class="thumb">
+                <img
+                  :src="'https://img.youtube.com/vi/' + v.id + '/maxresdefault.jpg'"
+                  :alt="v.title"
+                  loading="lazy"
+                  @error="$event.target.src = 'https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg'"
+                >
+                <div class="play-overlay" aria-hidden="true">
+                  <div class="play-ring">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <span class="card-cat" x-show="v.tag" x-text="v.tag"></span>
+                <h3 class="card-title" x-text="v.title"></h3>
+                <p class="card-channel" x-text="v.channel"></p>
+              </div>
+            </article>
+          </template>
         </div>
       </div>
     </div><!-- /issues tab -->
@@ -673,7 +795,7 @@
       return {
         scrolled:      false,
         menuOpen:      false,
-        tab:           'demos',
+        tab:           'issues',
         filter:        'all',
         search:        '',
         modal:         null,
