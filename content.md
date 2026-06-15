@@ -1,7 +1,7 @@
 ## Videos
 
--  | Isolated issue
--  | Deep Dive
+https://www.youtube.com/watch?v=2ca7r89JliQ&cc_load_policy=1  | Isolated issue
+https://www.youtube.com/watch?v=Gejt3LujMmY&cc_load_policy=1  | Deep Dive
 
 ---
 
@@ -54,8 +54,39 @@
 1. **UNCLEAR** - units: pieces / per person / per night / per night per person, etc VS how it's shown in the checkout - I don't get it. Docs?
 
 
-### #7 TBC
+## v0.0.2 — 15 June 2026
 
+### #1 Missing feature: NEWSLETTER
+
+- **Can't send or even draft a single newsletter** — are all the signup features just useless? Am I blind?
+
+
+### #2 Missing feature: Demand HEATMAP
+
+- **Where is it?** - link?
+
+
+### #3 Missing feature: OCCUPANCY FORECAST
+
+- **Where is it?** - link?
+
+
+### #3 Missing feature: OCCUPANCY FORECAST
+
+
+### #4 Missing feature: DERIVED PRICING of additional adults AND CHILDREN
+
+- **Listed as 2 separate features in the offer - Rate Plan Dependency + Derived Rates by Occupancy and Age categories**
+
+- **it simply doesn't work**  
+
+
+### #5 Broken feature: Google Free Booking Links receives prices that are not actually available due to restrictions
+- **we need to exclude packages from being sent to Google** - the packages have agressive discounts because they have agressive restrictions, like min 5 nights starting only on Sunday 
+
+**we don't want to send the rates of stay packages to Google** 
+
+### TBC...
 
 
 ## Fixed
