@@ -1,7 +1,7 @@
 ## Videos
 
-https://www.youtube.com/watch?v=2ca7r89JliQ&cc_load_policy=1  | Isolated issue
-https://www.youtube.com/watch?v=Gejt3LujMmY&cc_load_policy=1  | Deep Dive
+https://www.youtube.com/watch?v=2ca7r89JliQ&cc_load_policy=1  | MASSIVE PROBLEM 
+https://www.youtube.com/watch?v=Gejt3LujMmY&cc_load_policy=1  | MISSING FEATURES
 
 ---
 
