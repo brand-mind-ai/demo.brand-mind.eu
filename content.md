@@ -78,10 +78,28 @@ https://www.youtube.com/watch?v=Gejt3LujMmY&cc_load_policy=1  | MISSING FEATURES
 
 - **Listed as 2 separate features in the offer - Rate Plan Dependency + Derived Rates by Occupancy and Age categories**
 
-- **it simply doesn't work**  
+- **it simply doesn't work**
+
+### #5 Missing feature: VOUCHERS
+
+**- Added but impossible to order**
+
+### #6 Missing feature: DISCOUNTS 
+
+**- AMOUNT discounts  are converted into percentages**
+**- the restrictions don't work**
+
+### #7 Missing feature: DISCOUNTS CODES (BOTH PERCENTAGE AND FIXED AMOUNT)
+
+- **they don't work. I can add them, but they don't change the prices**
+- 
+- **I can add them even in a restricted period**
 
 
-### #5 Broken feature: Google Free Booking Links receives prices that are not actually available due to restrictions
+
+
+
+### #8 Broken feature: Google Free Booking Links receives prices that are not actually available due to restrictions
 - **we need to exclude packages from being sent to Google** - the packages have agressive discounts because they have agressive restrictions, like min 5 nights starting only on Sunday 
 
 **we don't want to send the rates of stay packages to Google** 
